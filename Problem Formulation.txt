@@ -16,3 +16,17 @@
   normal to 18 gipfs.
 - Additional information we can store about the state are the number of pieces the opponent has
   left. This is vital for calculating an evaluation of every state up to the choosen cut-off depth.
+
+2. Actions:
+- There are various action an agent can take. For now on, we will just stick to the standard game 
+  rules as that is what our agent is following. The first action an agent can make is placing its
+  3 GIPF-pieces down on the corners. If our agent is white, it will get to choose any of the corners
+  to start otherwise simply place them down alternating with the opponent. As for playing, the agent
+  can place and push a piece onto the board. For a place and push to be legal, it must not shove any
+  end pieces off the board. Stemming off push and place, and agent can simply push in any direction
+  from its position. There are 6 different position a piece can move (assuming it doesn't randomly 
+  shove a piece off the board): N, NE, SE, S, SW, and NW. These are the positions surronding where it
+  is, it can only move once per turn. Finally, an agent can perform a collect move. This is when
+  four of their own colors are lined up in a row. When this happens are pieces all pieces connected to
+  the row, including the four, will be collected (the four back to stock pile, and any opponents pieces 
+  to permanently out of play).

@@ -43,3 +43,7 @@
   have no pieces left to play. As such they lose regardless of what the board looks like. The second is
   if a player loses all three of their gipf pieces. In this scenario it is just a board with a all three
   of the gipf pieces belonging to one player captured, regardless if that player still has moves to play.
+
+5. EVAL(S,D):
+ - S = state (the board) and D = depth (at which we cut off the search), the paramters taken in while
+   performing the search. 

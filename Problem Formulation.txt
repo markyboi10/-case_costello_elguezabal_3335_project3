@@ -30,3 +30,9 @@
   four of their own colors are lined up in a row. When this happens are pieces all pieces connected to
   the row, including the four, will be collected (the four back to stock pile, and any opponents pieces 
   to permanently out of play).
+3. Transition Model:
+- When an action is performed, the successor state depends on the type of action performed. If the piece
+  is played in with no other pieces being pushed, the new state is simply just that addition. If a
+  piece is consequently pushed because of the new piece, the new state will be that addition PLUS all the
+  other connecting pieces pushed down one. Lastly, if an action occurs where pieces are recollected or
+  opponents removed, the new state will be with the removed pieces AND an update to any pieces recollected.

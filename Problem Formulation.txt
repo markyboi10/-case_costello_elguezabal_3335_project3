@@ -1,0 +1,18 @@
+1. States: 
+- There are various legal board states to the game of Gipf. Let's start with the types
+  of starting boards. There are a total of three types, one for each variation of Gipf. 
+  The basic, standard, and tournament rules. The basic and standard rules follow the idea
+  of having each player start with three pieces positioned on the angulars (corners) of the
+  board such that every corner is an alternating color. In other words, each player takes turns
+  (with white being the first) placing their three pieces onto the corners in an alternating
+  order (white, black, white, etc). The ONLY difference with the standard rules as opposed to
+  the basic rules is that, the starting three pieces in standard are the GIPF-pieces. As for the 
+  tournament version, there is NO starting positions for the GIPF-pieces AND there can be any number
+  of GIPF-pieces put into play as long a standard piece isn't played yet. Basically, a player can 
+  start their GIPF-pieces wherever they'd like.
+- To continue the different types of states for in game play, there are many diffent legal ones.
+  The combanation of states depends on the game rules. Basic will be every combination of the 36 
+  pieces on the board, standard the 24 normal and 6 gipfs, and tournament anywhere from 36 
+  normal to 18 gipfs.
+- Additional information we can store about the state are the number of pieces the opponent has
+  left. This is vital for calculating an evaluation of every state up to the choosen cut-off depth.

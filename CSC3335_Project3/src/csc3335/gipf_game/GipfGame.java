@@ -265,7 +265,7 @@ public class GipfGame {
      * the pieces accordingly.
      */
     public void checkForFourInARow() {
-        ArrayList< Run> runs = new ArrayList();
+        ArrayList<Run> runs = new ArrayList();
         Integer curRun;
         Integer numInRun;
         int tempCol;

@@ -1,8 +1,12 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Main.java to edit this template
- */
 package gipf;
+
+
+import csc3335.gipf_game.GipfGame;
+import csc3335_project2.Random_Agent;
+import gipf.intelligence.Agent;
+import lombok.Getter;
+
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  *
@@ -10,11 +14,21 @@ package gipf;
  */
 public class Gipf {
 
-    /**
-     * @param args the command line arguments
-     */
+    @Getter
+    private static GipfGame gipfGame;
+
+    private static Agent agent;
+
     public static void main(String[] args) {
-        // TODO code application logic here
+
+        // Initialize a new GiphGame
+        gipfGame = new GipfGame(ThreadLocalRandom.current().nextInt(1,100));
+
+        // Initialize the Agent
+        agent = new Agent(gipfGame);
+
+        gipfGame.playGame(agent, new Random_Agent(gipfGame));
+
     }
     
 }

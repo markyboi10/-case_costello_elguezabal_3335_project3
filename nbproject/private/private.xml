@@ -2,6 +2,14 @@
 <project-private xmlns="http://www.netbeans.org/ns/project-private/1">
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
+<<<<<<< HEAD
         <group/>
+=======
+        <group>
+            <file>file:/C:/Users/Chris/StuetzleC@merrimack.edu/Course%20Materials/Spring%202023/CSC3335_S2023/CSC3335_Projects/CSC3335_Project3_Adversaries/CSC3335_Project3/src/csc3335/gipf_game/GipfGame.java</file>
+            <file>file:/C:/Users/Chris/StuetzleC@merrimack.edu/Course%20Materials/Spring%202023/CSC3335_S2023/CSC3335_Projects/CSC3335_Project3_Adversaries/CSC3335_Project3/src/csc3335_project3/CSC3335_Project3.java</file>
+            <file>file:/C:/Users/Chris/StuetzleC@merrimack.edu/Course%20Materials/Spring%202023/CSC3335_S2023/CSC3335_Projects/CSC3335_Project3_Adversaries/CSC3335_Project3/src/csc3335/gipf_game/Run.java</file>
+        </group>
+>>>>>>> ad4c805a1c8d44d83fb66a9248d93ae8b6428fef
     </open-files>
 </project-private>

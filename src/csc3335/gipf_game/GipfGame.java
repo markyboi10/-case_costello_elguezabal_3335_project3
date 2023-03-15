@@ -14,6 +14,13 @@ import java.util.Random;
  */
 public class GipfGame {
 
+    public static final String ANSI_LIGHTGRAY = "\u001B[38;2;192;192;192m";
+public static final String ANSI_LIGHTBLUE = "\u001B[34;1m";
+public static final String ANSI_DARKBLUE =  "\u001B[44m";
+public static final String ANSI_LIGHTGREEN = "\u001B[32;1m";
+public static final String ANSI_DARKGREEN = "\u001B[42m";
+
+    
     private GipfPlayable[] players;
     private Integer[] piecesLeft;
     private Integer[] gipfsRemaining;
@@ -359,13 +366,35 @@ public class GipfGame {
      * Prints the board in a somewhat readable fashion.
      */
     public void printBoard() {
-        System.out.println("-------BOARD-------");
-        for (int col = 0; col < 9; col++) {
-            for (int pos = 0; pos < board[col].length; pos++) {
+         System.out.println("-------BOARD-------");
+for (int col = 0; col < 9; col++) {
+        for (int pos = 0; pos < board[col].length; pos++) {
+            String piece = board[col][pos].toString();
+            if (piece.equals(GipfGame.EMPTY)) {
+                System.out.printf("%12s", Character.toString(letterValues[col])
+                        + " " + Integer.toString(pos + 1) + ": " + piece);
+            } else if(piece.equals("0")) {
                 System.out.printf("%12s", Character.toString(letterValues[col])
                         + " " + Integer.toString(pos + 1) + ": "
-                        + (board[col][pos].equals(GipfGame.EMPTY) ? " " : board[col][pos]));
+                        + ANSI_DARKGREEN + piece + "\u001B[0m"); // Reset the color after the string
+            } else if(piece.equals("1")) {
+                System.out.printf("%12s", Character.toString(letterValues[col])
+                        + " " + Integer.toString(pos + 1) + ": "
+                        + ANSI_DARKBLUE + piece + "\u001B[0m"); // Reset the color after the string
+            } else if(piece.equals("2")) {
+                System.out.printf("%12s", Character.toString(letterValues[col])
+                        + " " + Integer.toString(pos + 1) + ": "
+                        + ANSI_LIGHTGREEN + piece + "\u001B[0m"); // Reset the color after the string
+            } else if(piece.equals("3")) {
+                System.out.printf("%12s", Character.toString(letterValues[col])
+                        + " " + Integer.toString(pos + 1) + ": "
+                        + ANSI_LIGHTBLUE + piece + "\u001B[0m"); // Reset the color after the string
+            } else {
+                System.out.printf("%12s", Character.toString(letterValues[col])
+                        + " " + Integer.toString(pos + 1) + ": "
+                        + ANSI_LIGHTGRAY + piece + "\u001B[0m"); // Reset the color after the string
             }
+        }
             System.out.println();
         }
     }

@@ -7,7 +7,7 @@ import csc3335.gipf_game.GipfPlayable;
  *
  * @author Alex
  */
-public class Agent implements GipfPlayable {
+public class SuperDuperGipfWinner5000 implements GipfPlayable {
 
     private GipfGame gipfGame;
 
@@ -15,7 +15,7 @@ public class Agent implements GipfPlayable {
      * Default constructor
      * @param gipfGame Instance of game.
      */
-    public Agent(GipfGame gipfGame) {
+    public SuperDuperGipfWinner5000(GipfGame gipfGame) {
         this.gipfGame = gipfGame;
     }
 

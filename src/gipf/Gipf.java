@@ -2,7 +2,7 @@ package gipf;
 
 
 import csc3335.gipf_game.GipfGame;
-import csc3335_project2.Random_Agent;
+import csc3335_project3.Random_Agent;
 import gipf.intelligence.SuperDuperGipfWinner5000;
 import lombok.Getter;
 

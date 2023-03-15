@@ -47,3 +47,5 @@
 5. EVAL(S,D):
  - S = state (the board) and D = depth (at which we cut off the search), the paramters taken in while
    performing the search. 
+ - Mark, first though of evaluation function: Check firstEval.jpg
+   

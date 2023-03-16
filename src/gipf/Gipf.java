@@ -27,7 +27,7 @@ public class Gipf {
         // Initialize the Agent
         agent = new SuperDuperGipfWinner5000(gipfGame);
 
-        gipfGame.playGame(agent, new Random_Agent(gipfGame));
+        //gipfGame.playGame(agent, new Random_Agent(gipfGame));
 
     }
     

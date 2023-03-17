@@ -2,11 +2,7 @@ package gipf.intelligence;
 
 import csc3335.gipf_game.GipfGame;
 import csc3335.gipf_game.GipfPlayable;
-import merrimackutil.util.Pair;
-import merrimackutil.util.Tuple;
-
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -15,15 +11,14 @@ import java.util.Set;
  */
 public class SuperDuperGipfWinner5000 implements GipfPlayable {
 
-    private State state;
+    private GipfGame gipfGame;
 
     /**
      * Default constructor
      * @param gipfGame Instance of game.
      */
     public SuperDuperGipfWinner5000(GipfGame gipfGame) {
-        this.state = new State(gipfGame, null);
-        generateAllMoves(this.state, 1);
+        this.gipfGame = gipfGame;
     }
 
     private static final Integer[][][] moves
@@ -53,7 +48,7 @@ public class SuperDuperGipfWinner5000 implements GipfPlayable {
      * @param player Value of the player who is making the move
      * @return
      */
-    public Set<State> generateAllMoves(State g_state, int player) {
+    private Set<State> generateAllMoves(State g_state, int player) {
 
         Set<State> states = new HashSet<>();
         GipfGame game = g_state.getGipfGame();
@@ -86,38 +81,30 @@ public class SuperDuperGipfWinner5000 implements GipfPlayable {
      * Generates k states, and returns the leafs of all of the states.
      * Assigns parents and children
      * @param initial_state
-     * @param initial_player
+     * @param player
      * @param k
-     * @return
+     * @return Leafs of the tree
      */
-    public Set<State> generateKStates(int initial_state, int initial_player, int k) {
+    public Set<State> generateKStates(State initial_state, int player, int k) {
+        Set<State> leafs = generateAllMoves(initial_state, player);
 
-        int cur_player = initial_player;
+        if(k > 0)
+            leafs.forEach(n->generateKStates(n, player == 1 ? 0 : 1, k-1));
 
-        Set<State> leafs = null;
-
-        for(int i = 0; i < k; i++) {
-
-            //TODO: this recursion
-
-            // Changes the player being played
-            cur_player = cur_player == 1 ? 0 : 1;
-        }
-
-        return
+        return leafs;
     }
 
     @Override
     public String makeGipfMove(int i) {
 
-        // Returning variables! Edit these to return a position to make a move
-        char row = 'a'; // a-i index of rows for the piece to be placed in
-        int col = 1; // Depending on the col the value should be between 5-9
-        int direction = 0; // 0-5 Direction value representing which way the piece should be placed.
-
         // Generate states
+        // Construct current state.
+        final int tree_length = 3;
+        State state = new State(gipfGame, null);
+        Set<State> leafs = generateKStates(state, i, tree_length);
 
-        // Returns the position based
-        return "" + row + " " + col + " " + direction;
+
+        return "";
     }
 }
+

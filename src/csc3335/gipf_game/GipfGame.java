@@ -205,7 +205,6 @@ public static final String ANSI_DARKGREEN = "\u001B[42m";
      * @return Returns true if the move was made successfully, and false if not
      */
     public boolean makeMove(String move, Integer piece) {
-        System.out.println(move);
         // Then, make the move
         String[] pMove = move.split(" ");
         Integer col = this.convertLetterToIndex(pMove[0]);

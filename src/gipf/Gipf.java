@@ -3,9 +3,11 @@ package gipf;
 
 import csc3335.gipf_game.GipfGame;
 import csc3335_project3.Random_Agent;
+import gipf.intelligence.State;
 import gipf.intelligence.SuperDuperGipfWinner5000;
 import lombok.Getter;
 
+import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
@@ -27,8 +29,8 @@ public class Gipf {
         // Initialize the Agent
         agent = new SuperDuperGipfWinner5000(gipfGame);
 
-        //gipfGame.playGame(agent, new Random_Agent(gipfGame));
-
+        // Play the game
+        gipfGame.playGame(agent, new Random_Agent(gipfGame));
     }
     
 }

@@ -2,6 +2,8 @@ package gipf.intelligence;
 
 import csc3335.gipf_game.GipfGame;
 import csc3335.gipf_game.GipfPlayable;
+import sun.management.resources.agent;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -21,26 +23,6 @@ public class SuperDuperGipfWinner5000 implements GipfPlayable {
         this.gipfGame = gipfGame;
     }
 
-    private static final Integer[][][] moves
-            = {
-            {{0, 1}, {1, 1}, {1, 0}, {0, -1}, {-1, -1}, {-1, 0}}, // a
-            {{0, 1}, {1, 1}, {1, 0}, {0, -1}, {-1, -1}, {-1, 0}}, // b
-            {{0, 1}, {1, 1}, {1, 0}, {0, -1}, {-1, -1}, {-1, 0}}, // c
-            {{0, 1}, {1, 1}, {1, 0}, {0, -1}, {-1, -1}, {-1, 0}}, // d
-            {{0, 1}, {1, 0}, {1, -1}, {0, -1}, {-1, -1}, {-1, 0}}, // e
-            {{0, 1}, {1, 0}, {1, -1}, {0, -1}, {-1, 0}, {-1, 1}}, // f
-            {{0, 1}, {1, 0}, {1, -1}, {0, -1}, {-1, 0}, {-1, 1}}, // g
-            {{0, 1}, {1, 0}, {1, -1}, {0, -1}, {-1, 0}, {-1, 1}}, // h
-            {{0, 1}, {1, 0}, {1, -1}, {0, -1}, {-1, 0}, {-1, 1}} // i
-    };
-    public final String[] columns = {"a", "b", "c", "d", "e", "f", "g", "h", "i"};
-    private String convertColToLetter(Integer col) {
-        if (col < this.columns.length && col >= 0) {
-            return this.columns[col];
-        }
-        return null;
-    }
-
     /**
      * Generates all possible moves and returns them as states in a set
      *
@@ -53,22 +35,18 @@ public class SuperDuperGipfWinner5000 implements GipfPlayable {
         Set<State> states = new HashSet<>();
         GipfGame game = g_state.getGipfGame();
 
-        for(int i = 0; i < moves.length; i++) { // Col
+        for(String col_row : game.edgeSpots) {
+            String[] split = col_row.split(" ");
+            for(int direction = 0; direction < 6; direction++) {
+                // Construct the move
+                Move move = new Move(split[0], Integer.parseInt(split[1]), direction);
 
-            // Goes over each letter
-            for(int j = 0; j < moves[i].length; j++) { // Row
-                for(int k = 0; k < moves[i][j].length; k++) { // Direction
-                    int dir = moves[i][j][k];
-                    // Construct the move
-                    Move move = new Move(convertColToLetter(i), j, k);
+                // Create the game & create state & add it to states if it is legal
+                GipfGame t_game = new GipfGame(game); // cloned game
+                boolean legal_move = t_game.makeMove(move.toString(), player); // Make move
 
-                    // Create the game & create state & add it to states if it is legal
-                    GipfGame t_game = new GipfGame(game); // cloned game
-                    boolean legal_move = t_game.makeMove(move.toString(), player); // Make move
-
-                    if(legal_move) { // If the move is allowed.
-                        states.add(new State(t_game, move).setParent(g_state)); // add to states
-                    }
+                if(legal_move) { // If the move is allowed.
+                    states.add(new State(t_game, move).setParent(g_state)); // add to states
                 }
             }
         }
@@ -86,16 +64,27 @@ public class SuperDuperGipfWinner5000 implements GipfPlayable {
      * @return Leafs of the tree
      */
     public Set<State> generateKStates(State initial_state, int player, int k) {
-        Set<State> leafs = generateAllMoves(initial_state, player);
-
-        if(k > 0)
-            leafs.forEach(n->generateKStates(n, player == 1 ? 0 : 1, k-1));
-
+        HashSet<State> leafs = new HashSet<>();
+        generateKStatesRecursive(initial_state, player, k, leafs);
         return leafs;
+    }
+    private void generateKStatesRecursive(State initial_state, int player, int k, Set<State> leafs) {
+        if(k <= 0) {
+            // Append initial_state to leafs
+            leafs.add(initial_state);
+            return;
+        }
+
+        for(State leaf : generateAllMoves(initial_state, player)) {
+            int lvl = k-1;
+            generateKStatesRecursive(leaf, player == 1 ? 0 : 1, lvl, leafs);
+        }
+
     }
 
     @Override
     public String makeGipfMove(int i) {
+        System.out.println("Player " + i);
 
         // Generate states
         // Construct current state.
@@ -103,8 +92,10 @@ public class SuperDuperGipfWinner5000 implements GipfPlayable {
         State state = new State(gipfGame, null);
         Set<State> leafs = generateKStates(state, i, tree_length);
 
+        //Set<State> children = generateAllMoves(state, i);
+        System.out.println(leafs.size());
 
-        return "";
+        return leafs.stream().findAny().get().getMove().toString();
     }
 }
 

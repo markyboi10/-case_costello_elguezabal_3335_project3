@@ -23,7 +23,7 @@ public class SuperDuperGipfWinner5000 implements GipfPlayable {
      */
     public SuperDuperGipfWinner5000(GipfGame gipfGame) {
         this.state = new State(gipfGame, null);
-        generateAllMoves(this.state);
+        generateAllMoves(this.state, 1);
     }
 
     private static final Integer[][][] moves
@@ -72,7 +72,7 @@ public class SuperDuperGipfWinner5000 implements GipfPlayable {
                     boolean legal_move = t_game.makeMove(move.toString(), player); // Make move
 
                     if(legal_move) { // If the move is allowed.
-                        states.add(new State(t_game, move)); // add to states
+                        states.add(new State(t_game, move).setParent(g_state)); // add to states
                     }
                 }
             }

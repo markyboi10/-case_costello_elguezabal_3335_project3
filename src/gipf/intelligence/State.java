@@ -61,8 +61,9 @@ public class State {
         return parent;
     }
 
-    public void setParent(State parent) {
+    public State setParent(State parent) {
         this.parent = parent;
+        return this; // used in construction of states w/ parents
     }
 
     public Set<State> getChildren() {

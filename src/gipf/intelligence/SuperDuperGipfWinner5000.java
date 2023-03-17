@@ -2,10 +2,11 @@ package gipf.intelligence;
 
 import csc3335.gipf_game.GipfGame;
 import csc3335.gipf_game.GipfPlayable;
-import sun.management.resources.agent;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -66,6 +67,10 @@ public class SuperDuperGipfWinner5000 implements GipfPlayable {
     public Set<State> generateKStates(State initial_state, int player, int k) {
         HashSet<State> leafs = new HashSet<>();
         generateKStatesRecursive(initial_state, player, k, leafs);
+        System.out.println(leafs.toString());
+        System.out.println("size: " + leafs.size());
+        System.out.println("Parent: " + initial_state.toString());
+        System.out.println("Testing parent: " + "");
         return leafs;
     }
     private void generateKStatesRecursive(State initial_state, int player, int k, Set<State> leafs) {
@@ -79,7 +84,6 @@ public class SuperDuperGipfWinner5000 implements GipfPlayable {
             int lvl = k-1;
             generateKStatesRecursive(leaf, player == 1 ? 0 : 1, lvl, leafs);
         }
-
     }
 
     @Override
@@ -88,13 +92,15 @@ public class SuperDuperGipfWinner5000 implements GipfPlayable {
 
         // Generate states
         // Construct current state.
-        final int tree_length = 3;
+        final int tree_length = 2;
         State state = new State(gipfGame, null);
         Set<State> leafs = generateKStates(state, i, tree_length);
-
+        List<State> leafs_as_list = leafs.stream().collect(Collectors.toList());
         //Set<State> children = generateAllMoves(state, i);
         System.out.println(leafs.size());
 
+       
+        
         return leafs.stream().findAny().get().getMove().toString();
     }
 }

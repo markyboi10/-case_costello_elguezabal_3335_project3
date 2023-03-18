@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
  * @author Alex
  */
 public class SuperDuperGipfWinner5000 implements GipfPlayable {
-long startTime = System.currentTimeMillis();
+
     private GipfGame gipfGame;
 
     /**
@@ -87,6 +87,10 @@ long startTime = System.currentTimeMillis();
         }
     }
 
+    /*
+    Makes a move for the gipf game. Takes int i which represents
+    the player. 0 is us, 1 is the opp.
+    */
     @Override
     public String makeGipfMove(int i) {
         System.out.println("Player " + i);
@@ -100,12 +104,14 @@ long startTime = System.currentTimeMillis();
         //Set<State> children = generateAllMoves(state, i);
 
         String bestMove = "";
-        int alpha = 1000000000;
-        int beta = -1000000000;
-        int bestMoveValue = -1000000000;
+        int alpha = 1000000000; // random initialization for alpha
+        int beta = -1000000000; // random initialization for beta
+        int bestMoveValue = -1000000000; // random intiialozation for best valued move 
+        // for every leaf in the list of terminal leaves
         for (State leaf : leafs_as_list) {
-  
+            // Call minimax algorithm, takes each state in and performs eval
             int moveValue = minimax2(leaf, tree_length, 1 - i, alpha, beta);
+            // if the value of a leaf is greater than a predecessor, update
             if (moveValue > bestMoveValue) {
                 bestMoveValue = moveValue;
                 bestMove = leaf.getMove().toString();
@@ -113,36 +119,47 @@ long startTime = System.currentTimeMillis();
         }
 
         System.out.println("Best move: " + bestMove);
-long endTime = System.currentTimeMillis();
-long elapsedTime = endTime - startTime;
-System.out.println("Elapsed time: " + elapsedTime + " ms");
-        return leafs.stream().findAny().get().getMove().toString();
+
+        return bestMove;
     }
 
+    /* 
+    Implements the minimax algorithm to evaluate a move given a state.
+    The position is the current state being looked at, depth is where we are
+    in the tree, i the player, and alpha and beta to prune the tree
+    */
     private int minimax2(State position, int depth, int i, int alpha, int beta) {
         //System.out.println("p2" + position.getChildren());
         if (depth == 0 || position.getChildren() == null) {
             return 0;//Reached a leaf node, needs to evaluate the terminal state
         }
 
+        // If us
         if (i == 0) {
+            // Initialize maxEval
             int maxEval = -1000000000;
             
+            // Evaluate every possible move of that state
             for (State child : position.getChildren()) {
                 int eval = minimax2(child, depth - 1, i, alpha, beta);
                 maxEval = max(maxEval, eval);
                 alpha = max(alpha, eval);
+                // If beta is less or equal, prune
                 if (beta <= alpha) {
                     break;
                 }
             }
             return maxEval;
+        // If opp.
         } else {
+            // Initialize minEval
             int minEval = 1000000000;
+            // Evaluate every possible move of that state
             for (State child : position.getChildren()) {
                 int eval = minimax2(child, depth - 1, i, alpha, beta);
                 minEval = max(minEval, eval);
                 beta = min(beta, eval);
+                // If beta is less or equal, prune
                 if (beta <= alpha) {
                     break;
                 }
@@ -151,6 +168,5 @@ System.out.println("Elapsed time: " + elapsedTime + " ms");
             return minEval;
         }
     }
-
 
 }

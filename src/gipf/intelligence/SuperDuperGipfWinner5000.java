@@ -109,8 +109,9 @@ public class SuperDuperGipfWinner5000 implements GipfPlayable {
         int bestMoveValue = -1000000000; // random intiialozation for best valued move 
         // for every leaf in the list of terminal leaves
         for (State leaf : leafs_as_list) {
-            // Call minimax algorithm, takes each state in and performs eval
-            int moveValue = minimax2(leaf, tree_length, 1 - i, alpha, beta);
+            State parent = leaf.getParent();
+            // Call minimax algorithm, takes each state in and performs eval, int 1-i switches between 0 and 1 when it recieves recursive call 
+            int moveValue = minimax2(parent, tree_length, 1-i, alpha, beta);
             // if the value of a leaf is greater than a predecessor, update
             if (moveValue > bestMoveValue) {
                 bestMoveValue = moveValue;
@@ -129,34 +130,41 @@ public class SuperDuperGipfWinner5000 implements GipfPlayable {
     in the tree, i the player, and alpha and beta to prune the tree
     */
     private int minimax2(State position, int depth, int i, int alpha, int beta) {
-        //System.out.println("p2" + position.getChildren());
+        //System.out.println("Is children null? - " + position.getChildren());
         if (depth == 0 || position.getChildren() == null) {
-            return 0;//Reached a leaf node, needs to evaluate the terminal state
+            int evalFct = gipfGame.getPiecesLeft(i);
+            return evalFct;//Reached a leaf node, needs to evaluate the terminal state
         }
 
         // If us
+        //System.out.println("The i is: " + i);
         if (i == 0) {
+            System.out.println("The i is: " + i);
+            //System.out.println("Inside of i = 0 REACHED");
             // Initialize maxEval
             int maxEval = -1000000000;
             
             // Evaluate every possible move of that state
             for (State child : position.getChildren()) {
-                int eval = minimax2(child, depth - 1, i, alpha, beta);
+                int eval = minimax2(child, depth - 1, 1, alpha, beta);
                 maxEval = max(maxEval, eval);
                 alpha = max(alpha, eval);
                 // If beta is less or equal, prune
                 if (beta <= alpha) {
-                    break;
+                    //break;
                 }
             }
+            //System.out.println(maxEval);
             return maxEval;
         // If opp.
+        
         } else {
+            //System.out.println("The i is: " + i);
             // Initialize minEval
             int minEval = 1000000000;
             // Evaluate every possible move of that state
             for (State child : position.getChildren()) {
-                int eval = minimax2(child, depth - 1, i, alpha, beta);
+                int eval = minimax2(child, depth - 1, 0, alpha, beta);
                 minEval = max(minEval, eval);
                 beta = min(beta, eval);
                 // If beta is less or equal, prune

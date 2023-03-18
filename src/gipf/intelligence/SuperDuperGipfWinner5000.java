@@ -2,6 +2,7 @@ package gipf.intelligence;
 
 import csc3335.gipf_game.GipfGame;
 import csc3335.gipf_game.GipfPlayable;
+import static java.lang.Integer.max;
 
 import java.util.HashSet;
 import java.util.List;
@@ -18,6 +19,7 @@ public class SuperDuperGipfWinner5000 implements GipfPlayable {
 
     /**
      * Default constructor
+     *
      * @param gipfGame Instance of game.
      */
     public SuperDuperGipfWinner5000(GipfGame gipfGame) {
@@ -36,9 +38,9 @@ public class SuperDuperGipfWinner5000 implements GipfPlayable {
         Set<State> states = new HashSet<>();
         GipfGame game = g_state.getGipfGame();
 
-        for(String col_row : game.edgeSpots) {
+        for (String col_row : game.edgeSpots) {
             String[] split = col_row.split(" ");
-            for(int direction = 0; direction < 6; direction++) {
+            for (int direction = 0; direction < 6; direction++) {
                 // Construct the move
                 Move move = new Move(split[0], Integer.parseInt(split[1]), direction);
 
@@ -46,7 +48,7 @@ public class SuperDuperGipfWinner5000 implements GipfPlayable {
                 GipfGame t_game = new GipfGame(game); // cloned game
                 boolean legal_move = t_game.makeMove(move.toString(), player); // Make move
 
-                if(legal_move) { // If the move is allowed.
+                if (legal_move) { // If the move is allowed.
                     states.add(new State(t_game, move).setParent(g_state)); // add to states
                 }
             }
@@ -57,8 +59,9 @@ public class SuperDuperGipfWinner5000 implements GipfPlayable {
     }
 
     /**
-     * Generates k states, and returns the leafs of all of the states.
-     * Assigns parents and children
+     * Generates k states, and returns the leafs of all of the states. Assigns
+     * parents and children
+     *
      * @param initial_state
      * @param player
      * @param k
@@ -67,21 +70,18 @@ public class SuperDuperGipfWinner5000 implements GipfPlayable {
     public Set<State> generateKStates(State initial_state, int player, int k) {
         HashSet<State> leafs = new HashSet<>();
         generateKStatesRecursive(initial_state, player, k, leafs);
-        System.out.println(leafs.toString());
-        System.out.println("size: " + leafs.size());
-        System.out.println("Parent: " + initial_state.toString());
-        System.out.println("Testing parent: " + "");
         return leafs;
     }
+
     private void generateKStatesRecursive(State initial_state, int player, int k, Set<State> leafs) {
-        if(k <= 0) {
+        if (k <= 0) {
             // Append initial_state to leafs
             leafs.add(initial_state);
             return;
         }
 
-        for(State leaf : generateAllMoves(initial_state, player)) {
-            int lvl = k-1;
+        for (State leaf : generateAllMoves(initial_state, player)) {
+            int lvl = k - 1;
             generateKStatesRecursive(leaf, player == 1 ? 0 : 1, lvl, leafs);
         }
     }
@@ -92,16 +92,51 @@ public class SuperDuperGipfWinner5000 implements GipfPlayable {
 
         // Generate states
         // Construct current state.
-        final int tree_length = 2;
+        final int tree_length = 3;
         State state = new State(gipfGame, null);
         Set<State> leafs = generateKStates(state, i, tree_length);
         List<State> leafs_as_list = leafs.stream().collect(Collectors.toList());
         //Set<State> children = generateAllMoves(state, i);
-        System.out.println(leafs.size());
 
-       
-        
+        String bestMove = "";
+        int bestMoveValue = -1000000000;
+        for (State leaf : leafs_as_list) {
+  
+            int moveValue = minimax2(leaf, tree_length, 1 - i);
+            if (moveValue > bestMoveValue) {
+                bestMoveValue = moveValue;
+                bestMove = leaf.getMove().toString();
+            }
+        }
+
+        System.out.println("Best move: " + bestMove);
+
         return leafs.stream().findAny().get().getMove().toString();
     }
-}
 
+    private int minimax2(State position, int depth, int i) {
+        //System.out.println("p2" + position.getChildren());
+        if (depth == 0 || position.getChildren() == null) {
+            return 0;//Reached a leaf node, needs to evaluate the terminal state
+        }
+
+        if (i == 0) {
+            int maxEval = -1000000000;
+            
+            for (State child : position.getChildren()) {
+                int eval = minimax2(child, depth - 1, i);
+                maxEval = max(maxEval, eval);
+            }
+            return maxEval;
+        } else {
+            int minEval = 1000000000;
+            for (State child : position.getChildren()) {
+                int eval = minimax2(child, depth - 1, i);
+                minEval = max(minEval, eval);
+            }
+            // System.out.println("This should never be hit" + minEval);
+            return minEval;
+        }
+    }
+
+}

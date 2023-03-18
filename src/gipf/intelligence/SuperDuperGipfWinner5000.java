@@ -132,7 +132,7 @@ public class SuperDuperGipfWinner5000 implements GipfPlayable {
     private int minimax2(State position, int depth, int i, int alpha, int beta) {
         //System.out.println("Is children null? - " + position.getChildren());
         if (depth == 0 || position.getChildren() == null) {
-            int evalFct = gipfGame.getPiecesLeft(i);
+            int evalFct = evaluate(i);
             return evalFct;//Reached a leaf node, needs to evaluate the terminal state
         }
 
@@ -175,6 +175,21 @@ public class SuperDuperGipfWinner5000 implements GipfPlayable {
             // System.out.println("This should never be hit" + minEval);
             return minEval;
         }
+    }
+
+    // Evaluation function for leaf nodes
+    private int evaluate(int i) {
+        int score = 0; // Initialize score
+        // If us
+        if (i == 0) {
+            // Eval board by checking who has more pieces
+            score = gipfGame.getPiecesLeft(0) - gipfGame.getPiecesLeft(1);
+        } else {
+            // Same eval but for opp. 1
+            score = gipfGame.getPiecesLeft(1) - gipfGame.getPiecesLeft(0);
+        }
+        // return
+        return score;
     }
 
 }

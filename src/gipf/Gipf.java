@@ -30,7 +30,7 @@ public class Gipf {
         agent = new SuperDuperGipfWinner5000(gipfGame);
 
         // Play the game
-        gipfGame.playGame(agent, new Random_Agent(gipfGame));
+        System.out.println(gipfGame.playGame(agent, new Random_Agent(gipfGame)));
     }
     
 }

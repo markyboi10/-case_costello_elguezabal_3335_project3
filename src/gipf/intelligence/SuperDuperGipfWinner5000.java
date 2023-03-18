@@ -4,7 +4,6 @@ import csc3335.gipf_game.GipfGame;
 import csc3335.gipf_game.GipfPlayable;
 import static java.lang.Integer.max;
 import static java.lang.Integer.min;
-import java.util.Comparator;
 
 import java.util.HashSet;
 import java.util.List;
@@ -49,7 +48,7 @@ public class SuperDuperGipfWinner5000 implements GipfPlayable {
         PriorityQueue<State> moveQueue = new PriorityQueue<>((State s1, State s2) -> {
             int piecesLeft1 = s1.getGipfGame().getPiecesLeft(player);
             int piecesLeft2 = s2.getGipfGame().getPiecesLeft(player);
-            return Integer.compare(piecesLeft2, piecesLeft1);
+            return piecesLeft1 - piecesLeft2;
         });
 
         for (String col_row : game.edgeSpots) {
@@ -63,7 +62,7 @@ public class SuperDuperGipfWinner5000 implements GipfPlayable {
                 boolean legal_move = t_game.makeMove(move.toString(), player); // Make move
 
                 if (legal_move) { // If the move is allowed.
-                    moveQueue.offer(new State(t_game, move).setParent(g_state)); // add to priority queue
+                    moveQueue.offer(new State(t_game, move).setParent(g_state)); // add to priority queue, .offer will add based on prioirity of state
                 }
             }
         }
@@ -112,7 +111,7 @@ public class SuperDuperGipfWinner5000 implements GipfPlayable {
     @Override
     public String makeGipfMove(int i) {
         System.out.println("Player " + i);
-
+        long startTime = System.currentTimeMillis();
         // Generate states
         // Construct current state.
         final int tree_length = 3;
@@ -122,9 +121,12 @@ public class SuperDuperGipfWinner5000 implements GipfPlayable {
         //Set<State> children = generateAllMoves(state, i);
 
         String bestMove = "";
-        int alpha = 1000000000; // random initialization for alpha
-        int beta = -1000000000; // random initialization for beta
-        int bestMoveValue = -1000000000; // random intiialozation for best valued move 
+        int alpha = 10; // random initialization for alpha
+        int beta = -10; // random initialization for beta
+        int bestMoveValue = -10; // random intiialozation for best valued move 
+        
+
+        
         // for every leaf in the list of terminal leaves
         for (State leaf : leafs_as_list) {
             State parent = leaf.getParent();
@@ -137,6 +139,9 @@ public class SuperDuperGipfWinner5000 implements GipfPlayable {
             }
         }
 
+        long endTime = System.currentTimeMillis();
+        long executionTime = endTime - startTime;
+        System.out.println("Execution time: " + executionTime + " ms");
         System.out.println("Best move: " + bestMove);
 
         return bestMove;
@@ -157,10 +162,10 @@ public class SuperDuperGipfWinner5000 implements GipfPlayable {
         // If us
         //System.out.println("The i is: " + i);
         if (i == 0) {
-            System.out.println("The i is: " + i);
+            //System.out.println("The i is: " + i);
             //System.out.println("Inside of i = 0 REACHED");
             // Initialize maxEval
-            int maxEval = -1000000000;
+            int maxEval = -10;
             
             // Evaluate every possible move of that state
             for (State child : position.getChildren()) {
@@ -179,7 +184,7 @@ public class SuperDuperGipfWinner5000 implements GipfPlayable {
         } else {
             //System.out.println("The i is: " + i);
             // Initialize minEval
-            int minEval = 1000000000;
+            int minEval = 10;
             // Evaluate every possible move of that state
             for (State child : position.getChildren()) {
                 int eval = minimax(child, depth - 1, 0, alpha, beta);
@@ -209,5 +214,6 @@ public class SuperDuperGipfWinner5000 implements GipfPlayable {
         // return
         return score;
     }
+    
 
 }

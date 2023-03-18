@@ -48,4 +48,12 @@
  - S = state (the board) and D = depth (at which we cut off the search), the paramters taken in while
    performing the search. 
  - Mark, first though of evaluation function: Check firstEval.jpg
+ - Second evalfunction: Yet to be formally defined
+ - How this works: We will have the agent switch between playing aggressive vs playing passive. My first eval
+   as an example of playing aggressive, but this is not always the best series of events to make. In reality, a
+   player is switching between these states. So, given a mathematical function to define pieces on the board, we
+   will switch over from aggressive to passive. From each scenario, there is in the worst case 42 possible moves to
+   generate which becomes 42^l. This is because every state generate, generates 42 more states. So for example,
+   Just going two iterations down (depth 1), you get 42*42 or 1,764 states to choose from, this is ofc without
+   alpha-pruning.
    

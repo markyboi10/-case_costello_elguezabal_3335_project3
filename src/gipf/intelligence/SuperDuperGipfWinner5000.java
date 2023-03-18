@@ -3,6 +3,7 @@ package gipf.intelligence;
 import csc3335.gipf_game.GipfGame;
 import csc3335.gipf_game.GipfPlayable;
 import static java.lang.Integer.max;
+import static java.lang.Integer.min;
 
 import java.util.HashSet;
 import java.util.List;
@@ -14,7 +15,7 @@ import java.util.stream.Collectors;
  * @author Alex
  */
 public class SuperDuperGipfWinner5000 implements GipfPlayable {
-
+long startTime = System.currentTimeMillis();
     private GipfGame gipfGame;
 
     /**
@@ -99,10 +100,12 @@ public class SuperDuperGipfWinner5000 implements GipfPlayable {
         //Set<State> children = generateAllMoves(state, i);
 
         String bestMove = "";
+        int alpha = 1000000000;
+        int beta = -1000000000;
         int bestMoveValue = -1000000000;
         for (State leaf : leafs_as_list) {
   
-            int moveValue = minimax2(leaf, tree_length, 1 - i);
+            int moveValue = minimax2(leaf, tree_length, 1 - i, alpha, beta);
             if (moveValue > bestMoveValue) {
                 bestMoveValue = moveValue;
                 bestMove = leaf.getMove().toString();
@@ -110,11 +113,13 @@ public class SuperDuperGipfWinner5000 implements GipfPlayable {
         }
 
         System.out.println("Best move: " + bestMove);
-
+long endTime = System.currentTimeMillis();
+long elapsedTime = endTime - startTime;
+System.out.println("Elapsed time: " + elapsedTime + " ms");
         return leafs.stream().findAny().get().getMove().toString();
     }
 
-    private int minimax2(State position, int depth, int i) {
+    private int minimax2(State position, int depth, int i, int alpha, int beta) {
         //System.out.println("p2" + position.getChildren());
         if (depth == 0 || position.getChildren() == null) {
             return 0;//Reached a leaf node, needs to evaluate the terminal state
@@ -124,19 +129,28 @@ public class SuperDuperGipfWinner5000 implements GipfPlayable {
             int maxEval = -1000000000;
             
             for (State child : position.getChildren()) {
-                int eval = minimax2(child, depth - 1, i);
+                int eval = minimax2(child, depth - 1, i, alpha, beta);
                 maxEval = max(maxEval, eval);
+                alpha = max(alpha, eval);
+                if (beta <= alpha) {
+                    break;
+                }
             }
             return maxEval;
         } else {
             int minEval = 1000000000;
             for (State child : position.getChildren()) {
-                int eval = minimax2(child, depth - 1, i);
+                int eval = minimax2(child, depth - 1, i, alpha, beta);
                 minEval = max(minEval, eval);
+                beta = min(beta, eval);
+                if (beta <= alpha) {
+                    break;
+                }
             }
             // System.out.println("This should never be hit" + minEval);
             return minEval;
         }
     }
+
 
 }

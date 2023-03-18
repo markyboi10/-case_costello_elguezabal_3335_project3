@@ -4,9 +4,11 @@ import csc3335.gipf_game.GipfGame;
 import csc3335.gipf_game.GipfPlayable;
 import static java.lang.Integer.max;
 import static java.lang.Integer.min;
+import java.util.Comparator;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.PriorityQueue;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -39,6 +41,17 @@ public class SuperDuperGipfWinner5000 implements GipfPlayable {
         Set<State> states = new HashSet<>();
         GipfGame game = g_state.getGipfGame();
 
+        /* 
+         Compare to, simple implementation to order states based on the priority assigned. In
+         theory this will speed up alpha beta pruning. Just using a simple, how many pieces
+         do each player have evaluation right now
+         */
+        PriorityQueue<State> moveQueue = new PriorityQueue<>((State s1, State s2) -> {
+            int piecesLeft1 = s1.getGipfGame().getPiecesLeft(player);
+            int piecesLeft2 = s2.getGipfGame().getPiecesLeft(player);
+            return Integer.compare(piecesLeft2, piecesLeft1);
+        });
+
         for (String col_row : game.edgeSpots) {
             String[] split = col_row.split(" ");
             for (int direction = 0; direction < 6; direction++) {
@@ -50,9 +63,14 @@ public class SuperDuperGipfWinner5000 implements GipfPlayable {
                 boolean legal_move = t_game.makeMove(move.toString(), player); // Make move
 
                 if (legal_move) { // If the move is allowed.
-                    states.add(new State(t_game, move).setParent(g_state)); // add to states
+                    moveQueue.offer(new State(t_game, move).setParent(g_state)); // add to priority queue
                 }
             }
+        }
+        
+        // Add states with highest priority, this is what .poll() does (head of the queue)
+        while (!moveQueue.isEmpty()) {
+            states.add(moveQueue.poll());
         }
 
         g_state.setChildren(states); // Assigns the parent state its children set
@@ -111,7 +129,7 @@ public class SuperDuperGipfWinner5000 implements GipfPlayable {
         for (State leaf : leafs_as_list) {
             State parent = leaf.getParent();
             // Call minimax algorithm, takes each state in and performs eval, int 1-i switches between 0 and 1 when it recieves recursive call 
-            int moveValue = minimax2(parent, tree_length, 1-i, alpha, beta);
+            int moveValue = minimax(parent, tree_length, 1-i, alpha, beta);
             // if the value of a leaf is greater than a predecessor, update
             if (moveValue > bestMoveValue) {
                 bestMoveValue = moveValue;
@@ -129,7 +147,7 @@ public class SuperDuperGipfWinner5000 implements GipfPlayable {
     The position is the current state being looked at, depth is where we are
     in the tree, i the player, and alpha and beta to prune the tree
     */
-    private int minimax2(State position, int depth, int i, int alpha, int beta) {
+    private int minimax(State position, int depth, int i, int alpha, int beta) {
         //System.out.println("Is children null? - " + position.getChildren());
         if (depth == 0 || position.getChildren() == null) {
             int evalFct = evaluate(i);
@@ -146,7 +164,7 @@ public class SuperDuperGipfWinner5000 implements GipfPlayable {
             
             // Evaluate every possible move of that state
             for (State child : position.getChildren()) {
-                int eval = minimax2(child, depth - 1, 1, alpha, beta);
+                int eval = minimax(child, depth - 1, 1, alpha, beta);
                 maxEval = max(maxEval, eval);
                 alpha = max(alpha, eval);
                 // If beta is less or equal, prune
@@ -164,7 +182,7 @@ public class SuperDuperGipfWinner5000 implements GipfPlayable {
             int minEval = 1000000000;
             // Evaluate every possible move of that state
             for (State child : position.getChildren()) {
-                int eval = minimax2(child, depth - 1, 0, alpha, beta);
+                int eval = minimax(child, depth - 1, 0, alpha, beta);
                 minEval = max(minEval, eval);
                 beta = min(beta, eval);
                 // If beta is less or equal, prune

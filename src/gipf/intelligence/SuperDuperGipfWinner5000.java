@@ -18,7 +18,9 @@ import java.util.stream.Collectors;
 public class SuperDuperGipfWinner5000 implements GipfPlayable {
 
     private GipfGame gipfGame;
-
+    private long startTime;
+    private long elapsedTime;
+    
     /**
      * Default constructor
      *
@@ -107,36 +109,45 @@ public class SuperDuperGipfWinner5000 implements GipfPlayable {
     /*
     Makes a move for the gipf game. Takes int i which represents
     the player. 0 is us, 1 is the opp.
-    */
+     */
     @Override
     public String makeGipfMove(int i) {
+
         System.out.println("Player " + i);
-        long startTime = System.currentTimeMillis();
+        int tree_length = 3;
+        startTime = System.currentTimeMillis();
+
         // Generate states
         // Construct current state.
-        final int tree_length = 3;
         State state = new State(gipfGame, null);
-        Set<State> leafs = generateKStates(state, i, tree_length);
-        List<State> leafs_as_list = leafs.stream().collect(Collectors.toList());
+//        Set<State> leafs = generateKStates(state, i, tree_length);
+//        List<State> leafs_as_list = leafs.stream().collect(Collectors.toList());
         //Set<State> children = generateAllMoves(state, i);
 
         String bestMove = "";
         int alpha = 10; // random initialization for alpha
         int beta = -10; // random initialization for beta
         int bestMoveValue = -10; // random intiialozation for best valued move 
-        
 
-        
-        // for every leaf in the list of terminal leaves
-        for (State leaf : leafs_as_list) {
-            State parent = leaf.getParent();
-            // Call minimax algorithm, takes each state in and performs eval, int 1-i switches between 0 and 1 when it recieves recursive call 
-            int moveValue = minimax(parent, tree_length, 1-i, alpha, beta);
-            // if the value of a leaf is greater than a predecessor, update
-            if (moveValue > bestMoveValue) {
-                bestMoveValue = moveValue;
-                bestMove = leaf.getMove().toString();
+        for (int depth = 1; depth <= tree_length; depth++) {
+            Set<State> leafs = generateKStates(state, i, depth);
+            List<State> leafs_as_list = leafs.stream().collect(Collectors.toList());
+            // for every leaf in the list of terminal leaves
+            for (State leaf : leafs_as_list) {
+                elapsedTime = System.currentTimeMillis() - startTime;
+                //System.out.println("Elapsed time " + elapsedTime);
+                //System.out.println("Depth " + depth);
+
+                State parent = leaf.getParent();
+                // Call minimax algorithm, takes each state in and performs eval, int 1-i switches between 0 and 1 when it recieves recursive call 
+                int moveValue = minimax(parent, tree_length, 1 - i, alpha, beta);
+                // if the value of a leaf is greater than a predecessor, update
+                if (moveValue > bestMoveValue) {
+                    bestMoveValue = moveValue;
+                    bestMove = leaf.getMove().toString();
+                }
             }
+
         }
 
         long endTime = System.currentTimeMillis();
@@ -147,17 +158,24 @@ public class SuperDuperGipfWinner5000 implements GipfPlayable {
         return bestMove;
     }
 
+
     /* 
     Implements the minimax algorithm to evaluate a move given a state.
     The position is the current state being looked at, depth is where we are
     in the tree, i the player, and alpha and beta to prune the tree
     */
     private int minimax(State position, int depth, int i, int alpha, int beta) {
-        //System.out.println("Is children null? - " + position.getChildren());
+//        timeLeft = System.currentTimeMillis() - startTime;
+//        System.out.println(timeLeft);
+//System.out.println("Is children null? - " + position.getChildren());
         if (depth == 0 || position.getChildren() == null) {
             int evalFct = evaluate(i);
             return evalFct;//Reached a leaf node, needs to evaluate the terminal state
         }
+        
+//            if (timeLeft >= 4000) { // check timeLeft before evaluating each state
+//        return 0; // return any arbitrary value to stop further evaluation
+//    }
 
         // If us
         //System.out.println("The i is: " + i);

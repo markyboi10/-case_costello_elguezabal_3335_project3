@@ -18,8 +18,6 @@ import java.util.stream.Collectors;
 public class SuperDuperGipfWinner5000 implements GipfPlayable {
 
     private GipfGame gipfGame;
-    private long startTime;
-    private long elapsedTime;
     
     /**
      * Default constructor
@@ -99,7 +97,7 @@ public class SuperDuperGipfWinner5000 implements GipfPlayable {
 
         System.out.println("Player " + i);
         int tree_length = 3;
-        startTime = System.currentTimeMillis();
+        long startTime = System.currentTimeMillis();
 
         // Generate states
         // Construct current state.
@@ -120,11 +118,14 @@ public class SuperDuperGipfWinner5000 implements GipfPlayable {
 
         System.out.println(System.currentTimeMillis() - startTime + "ms");
 
+        // Determine the best move string, we do this because I am setting state = null for the GC to come by.
+        String move = best_move.getMove().toString();
+
         // Break down the state space
         state = null;
 
         // Return the best move
-        return best_move.getMove().toString();
+        return move;
 
         /**
         String bestMove = "";

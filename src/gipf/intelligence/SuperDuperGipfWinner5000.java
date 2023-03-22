@@ -42,17 +42,6 @@ public class SuperDuperGipfWinner5000 implements GipfPlayable {
         Set<State> states = new HashSet<>();
         GipfGame game = g_state.getGipfGame();
 
-        /* 
-         Compare to, simple implementation to order states based on the priority assigned. In
-         theory this will speed up alpha beta pruning. Just using a simple, how many pieces
-         do each player have evaluation right now
-         */
-        PriorityQueue<State> moveQueue = new PriorityQueue<>((State s1, State s2) -> {
-            int piecesLeft1 = s1.getGipfGame().getPiecesLeft(player);
-            int piecesLeft2 = s2.getGipfGame().getPiecesLeft(player);
-            return piecesLeft1 - piecesLeft2;
-        });
-
         for (String col_row : game.edgeSpots) {
             String[] split = col_row.split(" ");
             for (int direction = 0; direction < 6; direction++) {
@@ -64,14 +53,9 @@ public class SuperDuperGipfWinner5000 implements GipfPlayable {
                 boolean legal_move = t_game.makeMove(move.toString(), player); // Make move
 
                 if (legal_move) { // If the move is allowed.
-                    moveQueue.offer(new State(t_game, move).setParent(g_state)); // add to priority queue, .offer will add based on prioirity of state
+                    states.add(new State(t_game, move).setParent(g_state)); // add to priority queue, .offer will add based on prioirity of state
                 }
             }
-        }
-        
-        // Add states with highest priority, this is what .poll() does (head of the queue)
-        while (!moveQueue.isEmpty()) {
-            states.add(moveQueue.poll());
         }
 
         g_state.setChildren(states); // Assigns the parent state its children set

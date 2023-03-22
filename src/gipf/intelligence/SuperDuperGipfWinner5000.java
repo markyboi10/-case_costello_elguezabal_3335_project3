@@ -120,6 +120,9 @@ public class SuperDuperGipfWinner5000 implements GipfPlayable {
 
         System.out.println(System.currentTimeMillis() - startTime + "ms");
 
+        // Break down the state space
+        state = null;
+
         // Return the best move
         return best_move.getMove().toString();
 
@@ -168,7 +171,7 @@ public class SuperDuperGipfWinner5000 implements GipfPlayable {
      * @param position Current state
      * @param depth Current depth of the tree
      * @param i Current players turn (MIN or MAX)
-     * @param starting_i Starting players turn
+     * @param starting_i Starting players turn (our value, since it is our move)
      * @param alpha
      * @param beta
      * @return
@@ -178,7 +181,8 @@ public class SuperDuperGipfWinner5000 implements GipfPlayable {
 //        System.out.println(timeLeft);
 //System.out.println("Is children null? - " + position.getChildren());
         if (depth == 0 || position.getChildren() == null) {
-            double evalFct = evaluate();
+            double evalFct = evaluate(position, i, starting_i);
+            position.setEvaluation(evalFct); // Assigns this position the evaluation
             return evalFct; //Reached a leaf node, needs to evaluate the terminal state
         }
         
@@ -239,8 +243,18 @@ public class SuperDuperGipfWinner5000 implements GipfPlayable {
         }
     }
 
+    /**
+     * Eval function
+     *
+     * @param state State containing the GipfGame
+     * @param player Current player value
+     * @param our_player_value value that is our value. Ex. if we are player 1 then player == 1 and our_player_value == 1 if it is our board
+     *                         We know since we are evaluating on level 3 that this will always be our evaluation, though if we every go further
+     *                         down in the tree this would be something good to know.
+     * @return
+     */
     // Evaluation function for leaf nodes
-    private double evaluate() {
+    private double evaluate(State state, int player, int our_player_value) {
         double score = 0; // Initialize score
         // Eval 1: OurPiecesLeft - TheirPiecesLeft. Simple, but good start
         /*// If it is our turn
@@ -251,13 +265,13 @@ public class SuperDuperGipfWinner5000 implements GipfPlayable {
         // Idea: Starve their opponents. If our pieces get low, exponentially recover pieces (lg function accomplishes this). If their pieces get low, keep it that way.
         
         // Prioritize retrieving our pieces logarithmically (if we have a lot of pieces, we're already happy, don't worry about it, but if we're low, start retrieving).
-        double prioOurPieces = Math.log(gipfGame.getPiecesLeft(0)) / Math.log(2);
+        double prioOurPieces = Math.log(state.getGipfGame().getPiecesLeft(0)) / Math.log(2);
         // Prioritize tracking enemy's pieces by:
             // 1. If they've got 0, we are infinitely happy (negative because we subtract starveEnemy)
             // 2. If not, then we prioritize it by how many they have left rationally
                 // a. If they have a lot of pieces, don't worry yet, it will dwindle as we starve
                 // b. If they have very few pieces, really try to keep them starving
-        double prioEnemyPieces = gipfGame.getPiecesLeft(1) == 0 ? -10000000 : (18 / gipfGame.getPiecesLeft(1)) - 1;
+        double prioEnemyPieces = state.getGipfGame().getPiecesLeft(1) == 0 ? -10000000 : (18f / state.getGipfGame().getPiecesLeft(1)) - 1;
         // Prioritize enemy runs linearly, placing double the weight on 3-in-a-row.
         double enemyRuns = (num2InARow() / 2) + num3InARow();
         // Starve enemies by minimizing runs and enemy pieces

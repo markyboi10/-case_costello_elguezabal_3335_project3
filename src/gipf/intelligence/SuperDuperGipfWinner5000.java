@@ -125,9 +125,9 @@ public class SuperDuperGipfWinner5000 implements GipfPlayable {
         //Set<State> children = generateAllMoves(state, i);
 
         String bestMove = "";
-        int alpha = 10; // random initialization for alpha
-        int beta = -10; // random initialization for beta
-        int bestMoveValue = -10; // random intiialozation for best valued move 
+        double alpha = 10; // random initialization for alpha
+        double beta = -10; // random initialization for beta
+        double bestMoveValue = -10; // random intiialozation for best valued move 
 
         for (int depth = 1; depth <= tree_length; depth++) {
             Set<State> leafs = generateKStates(state, i, depth);
@@ -140,7 +140,7 @@ public class SuperDuperGipfWinner5000 implements GipfPlayable {
 
                 State parent = leaf.getParent();
                 // Call minimax algorithm, takes each state in and performs eval, int 1-i switches between 0 and 1 when it recieves recursive call 
-                int moveValue = minimax(parent, tree_length, 1 - i, alpha, beta);
+                double moveValue = minimax(parent, tree_length, 1 - i, alpha, beta);
                 // if the value of a leaf is greater than a predecessor, update
                 if (moveValue > bestMoveValue) {
                     bestMoveValue = moveValue;
@@ -164,13 +164,13 @@ public class SuperDuperGipfWinner5000 implements GipfPlayable {
     The position is the current state being looked at, depth is where we are
     in the tree, i the player, and alpha and beta to prune the tree
     */
-    private int minimax(State position, int depth, int i, int alpha, int beta) {
+    private double minimax(State position, int depth, int i, double alpha, double beta) {
 //        timeLeft = System.currentTimeMillis() - startTime;
 //        System.out.println(timeLeft);
 //System.out.println("Is children null? - " + position.getChildren());
         if (depth == 0 || position.getChildren() == null) {
-            int evalFct = evaluate(i);
-            return evalFct;//Reached a leaf node, needs to evaluate the terminal state
+            double evalFct = evaluate();
+            return evalFct; //Reached a leaf node, needs to evaluate the terminal state
         }
         
 //            if (timeLeft >= 4000) { // check timeLeft before evaluating each state
@@ -183,17 +183,17 @@ public class SuperDuperGipfWinner5000 implements GipfPlayable {
             //System.out.println("The i is: " + i);
             //System.out.println("Inside of i = 0 REACHED");
             // Initialize maxEval
-            int maxEval = -10;
+            double maxEval = -100000; // -inf
             
             // Evaluate every possible move of that state
             for (State child : position.getChildren()) {
-                int eval = minimax(child, depth - 1, 1, alpha, beta);
-                maxEval = max(maxEval, eval);
-                alpha = max(alpha, eval);
+                double eval = minimax(child, depth - 1, 1, alpha, beta);
+                maxEval = Double.max(maxEval, eval);
+                //alpha = max(alpha, eval);
                 // If beta is less or equal, prune
-                if (beta <= alpha) {
+                //if (beta <= alpha) {
                     //break;
-                }
+                //}
             }
             //System.out.println(maxEval);
             return maxEval;
@@ -202,16 +202,16 @@ public class SuperDuperGipfWinner5000 implements GipfPlayable {
         } else {
             //System.out.println("The i is: " + i);
             // Initialize minEval
-            int minEval = 10;
+            double minEval = 100000; // inf
             // Evaluate every possible move of that state
             for (State child : position.getChildren()) {
-                int eval = minimax(child, depth - 1, 0, alpha, beta);
-                minEval = max(minEval, eval);
-                beta = min(beta, eval);
+                double eval = minimax(child, depth - 1, 0, alpha, beta);
+                minEval = Double.max(minEval, eval);
+                //beta = min(beta, eval);
                 // If beta is less or equal, prune
-                if (beta <= alpha) {
-                    break;
-                }
+                //if (beta <= alpha) {
+                    //break;
+                //}
             }
             // System.out.println("This should never be hit" + minEval);
             return minEval;
@@ -219,17 +219,23 @@ public class SuperDuperGipfWinner5000 implements GipfPlayable {
     }
 
     // Evaluation function for leaf nodes
-    private int evaluate(int i) {
-        int score = 0; // Initialize score
-        // If us
-        if (i == 0) {
-            // Eval board by checking who has more pieces
-            score = gipfGame.getPiecesLeft(0) - gipfGame.getPiecesLeft(1);
-        } else {
-            // Same eval but for opp. 1
-            score = gipfGame.getPiecesLeft(1) - gipfGame.getPiecesLeft(0);
-        }
-        // return
+    private double evaluate() {
+        double score = 0; // Initialize score
+        // Eval 1: OurPiecesLeft - TheirPiecesLeft. Simple, but good start
+        /*// If it is our turn
+        // Eval board by checking who has more pieces
+        score = gipfGame.getPiecesLeft(0) - gipfGame.getPiecesLeft(1);*/
+        
+        // Eval 2: lg(OurPiecesLeft) - StarveVal.
+        // Idea: Starve their opponents. If our pieces get low, exponentially recover pieces (lg function accomplishes this). If their pieces get low, keep it that way.
+        
+        // Prioritize retrieving our pieces logarithmically (if we have a lot of pieces, we're already happy, don't worry about it, but if we're low, start retrieving).
+        double prioOurPieces = Math.log(gipfGame.getPiecesLeft(0)) / Math.log(2);
+        //
+        prioEnemyPieces = gipfGame.getPiecesLeft(1) == 0 ? -10000000 : 36 / gipfGame.getPiecesLeft(1);
+        double starveEnemy = enemyRuns + prioEnemyPieces;
+
+        score = prioOurPieces - starveEnemy;
         return score;
     }
     

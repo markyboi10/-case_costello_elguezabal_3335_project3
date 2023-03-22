@@ -120,13 +120,28 @@ public class SuperDuperGipfWinner5000 implements GipfPlayable {
         // Generate states
         // Construct current state.
         State state = new State(gipfGame, null);
-//        Set<State> leafs = generateKStates(state, i, tree_length);
-//        List<State> leafs_as_list = leafs.stream().collect(Collectors.toList());
-        //Set<State> children = generateAllMoves(state, i);
+        Set<State> leafs = generateKStates(state, i, tree_length);
+        //List<State> leafs_as_list = leafs.stream().collect(Collectors.toList());
 
-        String bestMove = "";
         double alpha = 10; // random initialization for alpha
         double beta = -10; // random initialization for beta
+        double eval = minimax(state, tree_length, i, alpha, beta);
+
+        State best_move = state.getChildren().stream().filter(n -> n.getEvaluation()==eval).findFirst().orElse(null);
+
+        // If no best state is found, throw an exception
+        if(best_move == null) {
+            throw new NullPointerException();
+        }
+
+        System.out.println(System.currentTimeMillis() - startTime + "ms");
+
+        // Return the best move
+        return best_move.getMove().toString();
+
+        /**
+        String bestMove = "";
+
         double bestMoveValue = -10; // random intiialozation for best valued move 
 
         for (int depth = 1; depth <= tree_length; depth++) {
@@ -156,6 +171,7 @@ public class SuperDuperGipfWinner5000 implements GipfPlayable {
         System.out.println("Best move: " + bestMove);
 
         return bestMove;
+         **/
     }
 
 
@@ -183,7 +199,7 @@ public class SuperDuperGipfWinner5000 implements GipfPlayable {
             //System.out.println("The i is: " + i);
             //System.out.println("Inside of i = 0 REACHED");
             // Initialize maxEval
-            double maxEval = -100000; // -inf
+            double maxEval = Double.MIN_VALUE; // -inf
             
             // Evaluate every possible move of that state
             for (State child : position.getChildren()) {
@@ -202,7 +218,7 @@ public class SuperDuperGipfWinner5000 implements GipfPlayable {
         } else {
             //System.out.println("The i is: " + i);
             // Initialize minEval
-            double minEval = 100000; // inf
+            double minEval = Double.MAX_VALUE; // inf
             // Evaluate every possible move of that state
             for (State child : position.getChildren()) {
                 double eval = minimax(child, depth - 1, 0, alpha, beta);

@@ -231,10 +231,18 @@ public class SuperDuperGipfWinner5000 implements GipfPlayable {
         
         // Prioritize retrieving our pieces logarithmically (if we have a lot of pieces, we're already happy, don't worry about it, but if we're low, start retrieving).
         double prioOurPieces = Math.log(gipfGame.getPiecesLeft(0)) / Math.log(2);
-        //
-        prioEnemyPieces = gipfGame.getPiecesLeft(1) == 0 ? -10000000 : 36 / gipfGame.getPiecesLeft(1);
+        // Prioritize tracking enemy's pieces by:
+            // 1. If they've got 0, we are infinitely happy (negative because we subtract starveEnemy)
+            // 2. If not, then we prioritize it by how many they have left rationally
+                // a. If they have a lot of pieces, don't worry yet, it will dwindle as we starve
+                // b. If they have very few pieces, really try to keep them starving
+        double prioEnemyPieces = gipfGame.getPiecesLeft(1) == 0 ? -10000000 : (18 / gipfGame.getPiecesLeft(1)) - 1;
+        // Prioritize enemy runs linearly, placing double the weight on 3-in-a-row.
+        double enemyRuns = (num2InARow() / 2) + num3InARow();
+        // Starve enemies by minimizing runs and enemy pieces
         double starveEnemy = enemyRuns + prioEnemyPieces;
 
+        // Score based on the priority of keeping our pieces vs. priority of starving the enemy's pieces.
         score = prioOurPieces - starveEnemy;
         return score;
     }

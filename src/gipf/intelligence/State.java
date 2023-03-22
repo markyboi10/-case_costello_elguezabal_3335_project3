@@ -22,7 +22,7 @@ public class State {
     private Move move;
 
     // * Evaluation of this.gipfGame
-    private int evaluation = Integer.MIN_VALUE;
+    private double evaluation = 0;
 
     private State parent;
     private Set<State> children;
@@ -49,11 +49,11 @@ public class State {
         return move;
     }
 
-    public int getEvaluation() {
+    public double getEvaluation() {
         return evaluation;
     }
 
-    public void setEvaluation(int evaluation) {
+    public void setEvaluation(double evaluation) {
         this.evaluation = evaluation;
     }
 

@@ -214,6 +214,12 @@ public class SuperDuperGipfWinner5000 implements GipfPlayable {
             for (State child : position.getChildren()) {
                 double eval = minimax(child, depth - 1, 1-starting_i, starting_i, alpha, beta);
                 maxEval = Double.max(maxEval, eval);
+
+                // Assigns the evaluation of the parent to be the max evaluation of the children OR if it is 0 ie the first child
+                if(position.getEvaluation() == 0 || maxEval > position.getEvaluation()) {
+                    position.setEvaluation(maxEval);
+                }
+
                 //alpha = max(alpha, eval);
                 // If beta is less or equal, prune
                 //if (beta <= alpha) {
@@ -221,7 +227,7 @@ public class SuperDuperGipfWinner5000 implements GipfPlayable {
                 //}
             }
             //System.out.println(maxEval);
-            return maxEval;
+            return position.getEvaluation();
         // If opp.
         
         } else {
@@ -231,7 +237,13 @@ public class SuperDuperGipfWinner5000 implements GipfPlayable {
             // Evaluate every possible move of that state
             for (State child : position.getChildren()) {
                 double eval = minimax(child, depth - 1, starting_i, starting_i, alpha, beta);
-                minEval = Double.max(minEval, eval);
+                minEval = Double.min(minEval, eval);
+
+                // Assign the eval to the parent if it is less then the current eval OR if it is 0 ie first child
+                if(position.getEvaluation() == 0 || position.getEvaluation() < minEval) {
+                    position.setEvaluation(minEval);
+                }
+
                 //beta = min(beta, eval);
                 // If beta is less or equal, prune
                 //if (beta <= alpha) {
@@ -239,7 +251,7 @@ public class SuperDuperGipfWinner5000 implements GipfPlayable {
                 //}
             }
             // System.out.println("This should never be hit" + minEval);
-            return minEval;
+            return position.getEvaluation();
         }
     }
 

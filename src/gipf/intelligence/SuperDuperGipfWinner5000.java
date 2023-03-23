@@ -5,6 +5,7 @@ import csc3335.gipf_game.GipfPlayable;
 import static java.lang.Integer.max;
 import static java.lang.Integer.min;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.PriorityQueue;
@@ -95,8 +96,8 @@ public class SuperDuperGipfWinner5000 implements GipfPlayable {
     @Override
     public String makeGipfMove(int i) {
 
-        System.out.println("Player " + i);
-        int tree_length = 3;
+        //System.out.println("Player " + i);
+        final int tree_length = 3;
         long startTime = System.currentTimeMillis();
 
         // Generate states
@@ -107,7 +108,7 @@ public class SuperDuperGipfWinner5000 implements GipfPlayable {
 
         double alpha = 10; // random initialization for alpha
         double beta = -10; // random initialization for beta
-        double eval = minimax(state, tree_length, i, i, alpha, beta);
+        double eval = minimax(state, tree_length, true, i, alpha, beta);
 
         State best_move = state.getChildren().stream().filter(n -> n.getEvaluation()==eval).findFirst().orElse(null);
 
@@ -127,7 +128,9 @@ public class SuperDuperGipfWinner5000 implements GipfPlayable {
         // Return the best move
         return move;
 
-        /**
+        /** 
+         * Depth iterative -- deprecated (?)
+         * 
         String bestMove = "";
 
         double bestMoveValue = -10; // random intiialozation for best valued move 
@@ -177,12 +180,12 @@ public class SuperDuperGipfWinner5000 implements GipfPlayable {
      * @param beta
      * @return
      */
-    private double minimax(State position, int depth, int i, int starting_i, double alpha, double beta) {
+    private double minimax(State position, int depth, boolean maximizing, int starting_i, double alpha, double beta) {
 //        timeLeft = System.currentTimeMillis() - startTime;
 //        System.out.println(timeLeft);
 //System.out.println("Is children null? - " + position.getChildren());
         if (depth == 0 || position.getChildren() == null) {
-            double evalFct = evaluate(position, i, starting_i);
+            double evalFct = evaluate(position, starting_i);
             position.setEvaluation(evalFct); // Assigns this position the evaluation
             return evalFct; //Reached a leaf node, needs to evaluate the terminal state
         }
@@ -193,75 +196,45 @@ public class SuperDuperGipfWinner5000 implements GipfPlayable {
 
         // If us
         //System.out.println("The i is: " + i);
-        if (i == starting_i) {
-            //System.out.println("The i is: " + i);
-            //System.out.println("Inside of i = 0 REACHED");
-            // Initialize maxEval
-            double maxEval = Double.MIN_VALUE; // -inf
-            
-            // Evaluate every possible move of that state
-            for (State child : position.getChildren()) {
-                double eval = minimax(child, depth - 1, 1-starting_i, starting_i, alpha, beta);
-                maxEval = Double.max(maxEval, eval);
-
-                // Assigns the evaluation of the parent to be the max evaluation of the children OR if it is 0 ie the first child
-                if(position.getEvaluation() == 0 || maxEval > position.getEvaluation()) {
-                    position.setEvaluation(maxEval);
-                }
-
-                //alpha = max(alpha, eval);
-                // If beta is less or equal, prune
-                //if (beta <= alpha) {
-                    //break;
-                //}
-            }
-            //System.out.println(maxEval);
-            return position.getEvaluation();
-        // If opp.
+        //System.out.println("The i is: " + i);
+        //System.out.println("Inside of i = 0 REACHED");
+        // Initialize maxEval
+        double tempEval = maximizing ? Double.MIN_VALUE : Double.MAX_VALUE; // -inf or inf depending on if we're maxing or minning
         
-        } else {
-            //System.out.println("The i is: " + i);
-            // Initialize minEval
-            double minEval = Double.MAX_VALUE; // inf
-            // Evaluate every possible move of that state
-            for (State child : position.getChildren()) {
-                double eval = minimax(child, depth - 1, starting_i, starting_i, alpha, beta);
-                minEval = Double.min(minEval, eval);
+        // Evaluate every possible move of that state
+        for (State child : position.getChildren()) {
+            double eval = minimax(child, depth - 1, !maximizing, starting_i, alpha, beta);
+            tempEval = maximizing ? Double.max(tempEval, eval) : Double.min(tempEval, eval);
 
-                // Assign the eval to the parent if it is less then the current eval OR if it is 0 ie first child
-                if(position.getEvaluation() == 0 || position.getEvaluation() < minEval) {
-                    position.setEvaluation(minEval);
-                }
-
-                //beta = min(beta, eval);
-                // If beta is less or equal, prune
-                //if (beta <= alpha) {
-                    //break;
-                //}
-            }
-            // System.out.println("This should never be hit" + minEval);
-            return position.getEvaluation();
+            //alpha = max(alpha, eval);
+            // If beta is less or equal, prune
+            //if (beta <= alpha) {
+                //break;
+            //}
         }
+        position.setEvaluation(tempEval);
+        //System.out.println(maxEval);
+        return position.getEvaluation();
     }
 
     /**
      * Eval function
      *
      * @param state State containing the GipfGame
-     * @param player Current player value
      * @param our_player_value value that is our value. Ex. if we are player 1 then player == 1 and our_player_value == 1 if it is our board
      *                         We know since we are evaluating on level 3 that this will always be our evaluation, though if we every go further
      *                         down in the tree this would be something good to know.
      * @return
      */
     // Evaluation function for leaf nodes
-    private double evaluate(State state, int player, int our_player_value) {
+    private double evaluate(State state, int our_player_value) {
         double score = 0; // Initialize score
         // Eval 1: OurPiecesLeft - TheirPiecesLeft. Simple, but good start
         /*// If it is our turn
         // Eval board by checking who has more pieces
         score = gipfGame.getPiecesLeft(0) - gipfGame.getPiecesLeft(1);*/
         
+
         // Eval 2: lg(OurPiecesLeft) - StarveVal.
         // Idea: Starve their opponents. If our pieces get low, exponentially recover pieces (lg function accomplishes this). If their pieces get low, keep it that way.
         
@@ -274,13 +247,85 @@ public class SuperDuperGipfWinner5000 implements GipfPlayable {
                 // b. If they have very few pieces, really try to keep them starving
         double prioEnemyPieces = state.getGipfGame().getPiecesLeft(1) == 0 ? -10000000 : (18f / state.getGipfGame().getPiecesLeft(1)) - 1;
         // Prioritize enemy runs linearly, placing double the weight on 3-in-a-row.
-        double enemyRuns = (num2InARow() / 2) + num3InARow();
+        double enemyRuns = (countRuns(state.getGipfGame(), 2) / 2) + countRuns(state.getGipfGame(), 3);
         // Starve enemies by minimizing runs and enemy pieces
         double starveEnemy = enemyRuns + prioEnemyPieces;
 
         // Score based on the priority of keeping our pieces vs. priority of starving the enemy's pieces.
         score = prioOurPieces - starveEnemy;
+        
         return score;
+    }
+
+    /*
+        Helper Methods / Fields
+    */
+
+    // Necessary to count runs. Ripped from Prof. Stuetzle's GipfGame class 
+    private static final Integer[][][] moves
+        = {{{0, 1}, {1, 1}, {1, 0}, {0, -1}, {-1, -1}, {-1, 0}}, // a
+        {{0, 1}, {1, 1}, {1, 0}, {0, -1}, {-1, -1}, {-1, 0}}, // b
+        {{0, 1}, {1, 1}, {1, 0}, {0, -1}, {-1, -1}, {-1, 0}}, // c
+        {{0, 1}, {1, 1}, {1, 0}, {0, -1}, {-1, -1}, {-1, 0}}, // d
+        {{0, 1}, {1, 0}, {1, -1}, {0, -1}, {-1, -1}, {-1, 0}}, // e
+        {{0, 1}, {1, 0}, {1, -1}, {0, -1}, {-1, 0}, {-1, 1}}, // f
+        {{0, 1}, {1, 0}, {1, -1}, {0, -1}, {-1, 0}, {-1, 1}}, // g
+        {{0, 1}, {1, 0}, {1, -1}, {0, -1}, {-1, 0}, {-1, 1}}, // h
+        {{0, 1}, {1, 0}, {1, -1}, {0, -1}, {-1, 0}, {-1, 1}} // i
+    };
+
+    /**
+     * Copying off of prof's 4-in-a-row checker, we check for the number of 2-3 runs.
+     * 
+     * @param game current game state
+     * @return number of 2 to 3-in-a-row runs
+     */
+    private double countRuns(GipfGame game, int numInARow) {
+        double runs = 0;
+        Integer curRun;
+        Integer numInRun;
+        int tempCol;
+        int tempPos;
+        
+
+        Integer[][] board = game.getBoardCopy();
+
+        // For each edge spot
+        for (int col = 0; col < board.length; col++) {
+            for (int pos = 0; pos < board[col].length; pos++) {
+                // Is this the start of a four-in-a-row?
+                for (int dir = 0; dir < 6; dir++) {
+                    if (!board[col][pos].equals(GipfGame.EMPTY)) {
+                        curRun = board[col][pos] % 2;
+                        numInRun = 0;
+                        tempCol = col;
+                        tempPos = pos;
+                        // Count the run
+                        while (isInRange(tempCol, tempPos, board)
+                                && isSamePlayer(board[tempCol][tempPos], curRun)) {
+                            tempPos += moves[tempCol][dir][1];
+                            tempCol += moves[tempCol][dir][0];
+                            numInRun++;
+                        }
+                        if (numInRun == numInARow) {
+                            // Add the run to our list of runs
+                            runs++;
+                        }
+                    }
+                }
+            }
+        }
+
+        return runs;
+    }
+
+    private boolean isInRange(int col, int pos, Integer[][] board) {
+        return col >= 0 && col < board.length
+                && pos >= 0 & pos < board[col].length;
+    }
+
+    private boolean isSamePlayer(Integer piece, Integer curRun) {
+        return (piece % 2 == curRun % 2) && !piece.equals(GipfGame.EMPTY);
     }
     
 

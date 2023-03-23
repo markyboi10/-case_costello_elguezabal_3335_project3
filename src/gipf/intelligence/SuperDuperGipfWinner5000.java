@@ -104,6 +104,12 @@ public class SuperDuperGipfWinner5000 implements GipfPlayable {
         Set<State> leafs = generateKStates(state, i, tree_length);
         //List<State> leafs_as_list = leafs.stream().collect(Collectors.toList());
 
+        System.gc();
+        // In case where the children were never created.
+        if(state.getChildren() == null) {
+            generateKStates(state, i, tree_length);
+        }
+
         double alpha = 10; // random initialization for alpha
         double beta = -10; // random initialization for beta
         double eval = minimax(state, tree_length, true, i, alpha, beta);

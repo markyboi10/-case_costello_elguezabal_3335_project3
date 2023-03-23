@@ -2,15 +2,9 @@ package gipf.intelligence;
 
 import csc3335.gipf_game.GipfGame;
 import csc3335.gipf_game.GipfPlayable;
-import static java.lang.Integer.max;
-import static java.lang.Integer.min;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
-import java.util.PriorityQueue;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  *
@@ -109,6 +103,7 @@ public class SuperDuperGipfWinner5000 implements GipfPlayable {
         double alpha = 10; // random initialization for alpha
         double beta = -10; // random initialization for beta
         double eval = minimax(state, tree_length, true, i, alpha, beta);
+        System.out.println("Eval Selected: " + eval);
 
         State best_move = state.getChildren().stream().filter(n -> n.getEvaluation()==eval).findFirst().orElse(null);
 
@@ -239,21 +234,25 @@ public class SuperDuperGipfWinner5000 implements GipfPlayable {
         // Idea: Starve their opponents. If our pieces get low, exponentially recover pieces (lg function accomplishes this). If their pieces get low, keep it that way.
         
         // Prioritize retrieving our pieces logarithmically (if we have a lot of pieces, we're already happy, don't worry about it, but if we're low, start retrieving).
-        double prioOurPieces = Math.log(state.getGipfGame().getPiecesLeft(0)) / Math.log(2);
+        int ourPieces = state.getGipfGame().getPiecesLeft(our_player_value);
+        double prioOurPieces = ourPieces <= 0 ? 0 : 14 * (Math.log(state.getGipfGame().getPiecesLeft(our_player_value)) / Math.log(2));
         // Prioritize tracking enemy's pieces by:
             // 1. If they've got 0, we are infinitely happy (negative because we subtract starveEnemy)
             // 2. If not, then we prioritize it by how many they have left rationally
                 // a. If they have a lot of pieces, don't worry yet, it will dwindle as we starve
                 // b. If they have very few pieces, really try to keep them starving
-        double prioEnemyPieces = state.getGipfGame().getPiecesLeft(1) == 0 ? -10000000 : (18f / state.getGipfGame().getPiecesLeft(1)) - 1;
+        double prioEnemyPieces = -2 * state.getGipfGame().getPiecesLeft(1 - our_player_value) + 36;//state.getGipfGame().getPiecesLeft(1 - our_player_value) <= 0 ? -30 : (18f / state.getGipfGame().getPiecesLeft(1 - our_player_value)) - 1;
         // Prioritize enemy runs linearly, placing double the weight on 3-in-a-row.
-        double enemyRuns = (countRuns(state.getGipfGame(), 2) / 2) + countRuns(state.getGipfGame(), 3);
+        double enemyRuns = (countRuns(state.getGipfGame(), 2) / 4) + countRuns(state.getGipfGame(), 3);
         // Starve enemies by minimizing runs and enemy pieces
         double starveEnemy = enemyRuns + prioEnemyPieces;
 
         // Score based on the priority of keeping our pieces vs. priority of starving the enemy's pieces.
         score = prioOurPieces - starveEnemy;
-        
+
+        if(((Double)score).isNaN())
+            System.out.println("NaN found");
+
         return score;
     }
 

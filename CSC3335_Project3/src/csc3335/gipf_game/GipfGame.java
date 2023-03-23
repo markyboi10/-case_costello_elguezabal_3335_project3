@@ -160,15 +160,19 @@ public class GipfGame {
      */
     private int gameIsOver() {
         if (piecesLeft[0] == 0) {
+            System.out.println("Player 1 starved.");
             return 2;
         }
         if (piecesLeft[1] == 0) {
+            System.out.println("Player 2 starved.");
             return 1;
         }
         if (gipfsRemaining[0] == 0) {
+            System.out.println("Player 1 gipfs captured.");
             return 2;
         }
         if (gipfsRemaining[1] == 0) {
+            System.out.println("Player 2 gipfs captured.");
             return 1;
         }
         return 0;
@@ -198,7 +202,6 @@ public class GipfGame {
      * @return Returns true if the move was made successfully, and false if not
      */
     public boolean makeMove(String move, Integer piece) {
-        System.out.println(move);
         // Then, make the move
         String[] pMove = move.split(" ");
         Integer col = this.convertLetterToIndex(pMove[0]);

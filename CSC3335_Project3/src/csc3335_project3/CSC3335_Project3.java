@@ -18,22 +18,33 @@ public class CSC3335_Project3 {
         // Play the game with two agents
         int gamesPlayed = 0;
         int numWins = 0;
+        int starveWins = 0;
+        int gipfWins = 0;
         int numLosses = 0;
+        int starveLosses = 0;
+        int gipfLosses = 0;
         while(gamesPlayed < 10) {
             int result = g.playGame(new SuperDuperGipfWinner5000(g), new Random_Agent(g));
 
             System.out.println("Result: " + result);
 
-            if(result == 1)
+            if(result == 1 || result == 3) {
                 numWins++;
-            else
+                if(result == 1) starveWins++; else gipfWins++;
+            }
+            else {
                 numLosses++;
-
+                if(result == 2) starveLosses++; else gipfLosses++;
+            }
             gamesPlayed++;
         }
         //}
         System.out.println("Number of Wins: " + numWins);
+        System.out.println("Gipf Wins: " + gipfWins);
+        System.out.println("Starve Wins: " + starveWins);
         System.out.println("Number of Losses: " + numLosses);
+        System.out.println("Gipf Losses: " + gipfLosses);
+        System.out.println("Starve Losses: " + starveLosses);
         
         // testing copy constructor
         // GipfGame g2 = new GipfGame(g);

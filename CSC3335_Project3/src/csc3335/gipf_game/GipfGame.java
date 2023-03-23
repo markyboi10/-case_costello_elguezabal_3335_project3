@@ -169,11 +169,11 @@ public class GipfGame {
         }
         if (gipfsRemaining[0] == 0) {
             System.out.println("Player 1 gipfs captured.");
-            return 2;
+            return 4;
         }
         if (gipfsRemaining[1] == 0) {
             System.out.println("Player 2 gipfs captured.");
-            return 1;
+            return 3;
         }
         return 0;
     }

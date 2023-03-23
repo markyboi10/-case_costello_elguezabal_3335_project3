@@ -13,6 +13,8 @@ import java.util.Set;
 public class SuperDuperGipfWinner5000 implements GipfPlayable {
 
     private GipfGame gipfGame;
+    private static int ourStartingPiecesLeft;
+    private static int theirStartingPiecesLeft;
     
     /**
      * Default constructor
@@ -21,6 +23,8 @@ public class SuperDuperGipfWinner5000 implements GipfPlayable {
      */
     public SuperDuperGipfWinner5000(GipfGame gipfGame) {
         this.gipfGame = gipfGame;
+        ourStartingPiecesLeft = 18;
+        theirStartingPiecesLeft = 18;
     }
 
     /**
@@ -117,6 +121,10 @@ public class SuperDuperGipfWinner5000 implements GipfPlayable {
         // Determine the best move string, we do this because I am setting state = null for the GC to come by.
         String move = best_move.getMove().toString();
 
+        // Adjust starting points for pieces left (for eval).
+        ourStartingPiecesLeft = best_move.getGipfGame().getPiecesLeft(i);
+        theirStartingPiecesLeft = best_move.getGipfGame().getPiecesLeft(1 - i);
+
         // Break down the state space
         state = null;
 
@@ -194,19 +202,24 @@ public class SuperDuperGipfWinner5000 implements GipfPlayable {
         //System.out.println("The i is: " + i);
         //System.out.println("Inside of i = 0 REACHED");
         // Initialize maxEval
-        double tempEval = maximizing ? Double.MIN_VALUE : Double.MAX_VALUE; // -inf or inf depending on if we're maxing or minning
+        double tempEval = maximizing ? -Double.MAX_VALUE : Double.MAX_VALUE; // -inf or inf depending on if we're maxing or minning
         
         // Evaluate every possible move of that state
         for (State child : position.getChildren()) {
             double eval = minimax(child, depth - 1, !maximizing, starting_i, alpha, beta);
             tempEval = maximizing ? Double.max(tempEval, eval) : Double.min(tempEval, eval);
 
+            //System.out.println("Depth: " + depth);
+            //System.out.println("Current Eval: " + eval);
+            //System.out.println("TempEval: " + tempEval);
+            //System.out.println();
             //alpha = max(alpha, eval);
             // If beta is less or equal, prune
             //if (beta <= alpha) {
                 //break;
             //}
         }
+        //System.out.println("Set Evaluation: " + tempEval + ". At Depth: " + depth);
         position.setEvaluation(tempEval);
         //System.out.println(maxEval);
         return position.getEvaluation();
@@ -233,9 +246,9 @@ public class SuperDuperGipfWinner5000 implements GipfPlayable {
         // Eval 2: lg(OurPiecesLeft) - StarveVal.
         // Idea: Starve their opponents. If our pieces get low, exponentially recover pieces (lg function accomplishes this). If their pieces get low, keep it that way.
         
-        // Prioritize retrieving our pieces logarithmically (if we have a lot of pieces, we're already happy, don't worry about it, but if we're low, start retrieving).
+        /*// Prioritize retrieving our pieces logarithmically (if we have a lot of pieces, we're already happy, don't worry about it, but if we're low, start retrieving).
         int ourPieces = state.getGipfGame().getPiecesLeft(our_player_value);
-        double prioOurPieces = ourPieces <= 0 ? 0 : 14 * (Math.log(state.getGipfGame().getPiecesLeft(our_player_value)) / Math.log(2));
+        double prioOurPieces = 8 * ourPieces;// <= 0 ? 0 : Math.floor(18 * (Math.log(state.getGipfGame().getPiecesLeft(our_player_value)) / Math.log(2)));
         // Prioritize tracking enemy's pieces by:
             // 1. If they've got 0, we are infinitely happy (negative because we subtract starveEnemy)
             // 2. If not, then we prioritize it by how many they have left rationally
@@ -248,7 +261,12 @@ public class SuperDuperGipfWinner5000 implements GipfPlayable {
         double starveEnemy = enemyRuns + prioEnemyPieces;
 
         // Score based on the priority of keeping our pieces vs. priority of starving the enemy's pieces.
-        score = prioOurPieces - starveEnemy;
+        score = prioOurPieces;// - starveEnemy;*/
+
+        double ourScore = state.getGipfGame().getPiecesLeft(our_player_value) - ourStartingPiecesLeft;
+        double theirScore = state.getGipfGame().getPiecesLeft(1 - our_player_value) - theirStartingPiecesLeft;
+
+        score = ourScore - theirScore;
 
         if(((Double)score).isNaN())
             System.out.println("NaN found");

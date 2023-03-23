@@ -15,19 +15,8 @@ public class CSC3335_Project3 {
     public static void main(String[] args) {
         // Initialize the game with a random seed
         GipfGame g = new GipfGame( 85 );
-        
-        int numWins = 0;
-        int numLosses = 0;
-        int numGames = 0;
         // Play the game with two agents
-        //while(numGames < 10) {
             int result = g.playGame(new SuperDuperGipfWinner5000(g), new Random_Agent(g));
-            //if(result == 1)
-                //numWins++;
-            //else
-                //numLosses++;
-
-            //numGames++;
 
             System.out.println("Result: " + result);
         //}

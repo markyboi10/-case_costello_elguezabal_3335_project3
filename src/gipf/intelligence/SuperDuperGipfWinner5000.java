@@ -68,22 +68,25 @@ public class SuperDuperGipfWinner5000 implements GipfPlayable {
      * @param k
      * @return Leafs of the tree
      */
-    public Set<State> generateKStates(State initial_state, int player, int k) {
+    public Set<State> generateKStates(State initial_state, int player, int k, boolean debug) {
         HashSet<State> leafs = new HashSet<>();
-        generateKStatesRecursive(initial_state, player, k, leafs);
+        generateKStatesRecursive(initial_state, player, k, leafs, debug);
         return leafs;
     }
 
-    private void generateKStatesRecursive(State initial_state, int player, int k, Set<State> leafs) {
+    private void generateKStatesRecursive(State initial_state, int player, int k, Set<State> leafs, boolean debug) {
         if (k <= 0) {
             // Append initial_state to leafs
             leafs.add(initial_state);
             return;
         }
 
-        for (State leaf : generateAllMoves(initial_state, player)) {
+        Set<State> leaves = generateAllMoves(initial_state, player);
+        if(debug)
+            System.out.println(leaves);
+        for (State leaf : leaves) {
             int lvl = k - 1;
-            generateKStatesRecursive(leaf, player == 1 ? 0 : 1, lvl, leafs);
+            generateKStatesRecursive(leaf, player == 1 ? 0 : 1, lvl, leafs, debug);
         }
     }
 
@@ -101,13 +104,13 @@ public class SuperDuperGipfWinner5000 implements GipfPlayable {
         // Generate states
         // Construct current state.
         State state = new State(gipfGame, null);
-        Set<State> leafs = generateKStates(state, i, tree_length);
+        Set<State> leafs = generateKStates(state, i, tree_length, false);
         //List<State> leafs_as_list = leafs.stream().collect(Collectors.toList());
 
         System.gc();
         // In case where the children were never created.
-        if(state.getChildren() == null) {
-            generateKStates(state, i, tree_length);
+        if(state.getChildren().isEmpty()) {
+            generateKStates(state, i, tree_length, true);
         }
 
         double alpha = 10; // random initialization for alpha

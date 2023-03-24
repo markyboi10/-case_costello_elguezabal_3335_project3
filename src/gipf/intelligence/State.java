@@ -73,4 +73,9 @@ public class State {
     public void setChildren(Set<State> children) {
         this.children = children;
     }
+
+    @Override
+    public String toString() {
+        return this.move.toString();
+    }
 }

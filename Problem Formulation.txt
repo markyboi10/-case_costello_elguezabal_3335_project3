@@ -44,16 +44,16 @@
   if a player loses all three of their gipf pieces. In this scenario it is just a board with a all three
   of the gipf pieces belonging to one player captured, regardless if that player still has moves to play.
 
-5. EVAL(S,D):
- - S = state (the board) and D = depth (at which we cut off the search), the paramters taken in while
+5. EVAL(S,P):
+ - S = state (the board) and P = Our Player Number, the paramters taken in while
    performing the search. 
  - Mark, first though of evaluation function: Check firstEval.jpg
- - Second evalfunction: Yet to be formally defined
- - How this works: We will have the agent switch between playing aggressive vs playing passive. My first eval
-   as an example of playing aggressive, but this is not always the best series of events to make. In reality, a
-   player is switching between these states. So, given a mathematical function to define pieces on the board, we
-   will switch over from aggressive to passive. From each scenario, there is in the worst case 42 possible moves to
-   generate which becomes 42^l. This is because every state generate, generates 42 more states. So for example,
-   Just going two iterations down (depth 1), you get 42*42 or 1,764 states to choose from, this is ofc without
-   alpha-pruning.
-   
+ - Second evalfunction: Eval = PriorityOfRetainingOurPieces + 3(NumberOfOurRuns) - PriorityOfStarvingEnemy
+ - How this works: The agent will calculate the priority of retaining our pieces logarithmically, meaning
+ urgency of recovery increases with the less pieces we have. We then count the number of runs we have
+ (placing lower priority on runs of 2, and higher on runs of 3), and place a decent priority there.
+ The crux of our agent relies on starving the enemy of pieces. We calculate this by counting the number
+ of pieces the enemy has left (linearly -- we always like when they have less to use), and additionally
+ making sure the number of runs they have is low (AKA they can't recover pieces).
+
+ In other words, our agent is a pain!
